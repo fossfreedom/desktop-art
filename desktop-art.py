@@ -27,8 +27,8 @@ from gi.repository import Peas
 
 from DesktopControl import DesktopControl
 from CoverManager import CoverManager
-#from ConfigDialog import ConfigDialog
-#import DefaultGConfValues
+from ConfigDialog import ConfigDialog
+import DefaultGConfValues
 
 #package needed gir1.2-rsvg-2.0
 

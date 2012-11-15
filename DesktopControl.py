@@ -27,7 +27,7 @@ from gi.repository import GConf
 from gi.repository import Rsvg
 import cairo
 from roundedrec import roundedrec
-#from ConfigDialog import ConfigDialog
+from ConfigDialog import ConfigDialog
 
 # CONSTANTS
 
@@ -50,20 +50,21 @@ def read_GConf_values(values, keys):
     gc = GConf.Client.get_default()
     for key in keys:
         val = gc.get_without_default(GConf_path(key))
-        if val.type == GConf.ValueType.FLOAT:
-            values[key] = val.get_float()
-        elif val.type == GConf.ValueType.INT:
-            values[key] = val.get_int()
-        elif val.type == GConf.ValueType.STRING:
-            values[key] = val.get_string()
-        elif val.type == GConf.ValueType.BOOL:
-            values[key] = val.get_bool()
-        # Parse color strings
-        if 'color' in key:
-            values['%s_r' % key] = int(values[key][ 1: 5], 16) / int('ffff', 16)
-            values['%s_g' % key] = int(values[key][ 5: 9], 16) / int('ffff', 16)
-            values['%s_b' % key] = int(values[key][ 9:13], 16) / int('ffff', 16)
-            values['%s_a' % key] = int(values[key][13:17], 16) / int('ffff', 16)
+        if val:
+			if val.type == GConf.ValueType.FLOAT:
+				values[key] = val.get_float()
+			elif val.type == GConf.ValueType.INT:
+				values[key] = val.get_int()
+			elif val.type == GConf.ValueType.STRING:
+				values[key] = val.get_string()
+			elif val.type == GConf.ValueType.BOOL:
+				values[key] = val.get_bool()
+			# Parse color strings
+			if 'color' in key:
+				values['%s_r' % key] = int(values[key][ 1: 5], 16) / int('ffff', 16)
+				values['%s_g' % key] = int(values[key][ 5: 9], 16) / int('ffff', 16)
+				values['%s_b' % key] = int(values[key][ 9:13], 16) / int('ffff', 16)
+				values['%s_a' % key] = int(values[key][13:17], 16) / int('ffff', 16)
 
 def reread_GConf_value(conf, keys, key):
     if key in keys:
