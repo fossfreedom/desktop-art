@@ -80,7 +80,7 @@ class _ContextMenu(Gtk.Menu):
         self.show_player.connect('activate', self.toggle_player_visibility)
         self.add(self.show_player)
 
-        self.add(Gtk.SeparatorMenuItem())
+        self.add(Gtk.SeparatorMenuItem.new())
 
         #preferences = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
         preferences = Gtk.MenuItem.new_with_label('Preferences')
@@ -182,18 +182,8 @@ class DesktopControl(Gtk.DrawingArea):
         if tmp != hover:
             self.queue_draw()
 
-    #def expose(self, widget, event):
-    def draw_cb(self, widget, cr):
+    def draw_cb(self, widget, cc):
         print "do_draw_cb"
-        #cc = self.window.cairo_create()
-        #cr.set_source_rgba(.2, .2, .2, 0.9)
-        #cr.paint()
-        #cr.rectangle(event.area.x, event.area.y, event.area.width, event.area.height)
-        #cr.clip()
-        self.draw(cr)
-
-    def draw(self, cc):
-        print "draw"
         # Clear cairo context
         cc.set_source_rgba(0, 0, 0, 0)
         cc.set_operator(cairo.OPERATOR_SOURCE)
@@ -285,14 +275,14 @@ class DesktopControl(Gtk.DrawingArea):
 
         # Input mask, only the cover image is clickable
         # Will, (and should) only work if parent is Gtk.Window
-        #pixmask = Gtk.gdk.Pixmap(None, int(cover_area_size), int(cover_area_size), 1)
-        print "pixmask"
+        #print "pixmask"
         #pixmask = GdkPixmap(None, int(cover_area_size), int(cover_area_size), 1)
         #ccmask = pixmask.cairo_create()
         #roundedrec(ccmask, 0, 0, cover_area_size, cover_area_size, self.conf['roundness'])
         #ccmask.fill()
         #self.get_parent().input_shape_combine_mask(pixmask, int(x_trans), 0)
-
+        #suspect this should be Gdk.input_shape_combine_region (pixmask, int(x_trans), 0)
+        
         # Draw border
         if self.draw_border:
             print "drawborder"
