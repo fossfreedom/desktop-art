@@ -85,11 +85,10 @@ class ConfigDialog(Gtk.Dialog):
                     w[name].set_active(True)
             elif isinstance(w[name], Gtk.ColorButton):
                 rgba = self.gc.get_string(self.GConf_path(name))
-                #rgb = Gtk.gdk.color_parse(rgba[:-4])
-                rgb = Gdk.Color.parse(rgba[:-4])
+                _, color = Gdk.Color.parse( rgba[:-4] )
                 a = int(rgba[-4:], 16)
-                #w[name].set_color(rgb)  still to do
-                #w[name].set_alpha(a)    still to do
+                w[name].set_color(color)  
+                w[name].set_alpha(a)    
 
     def set_GConf_value(self, w, key):
         if isinstance(w, Gtk.SpinButton):

@@ -161,6 +161,7 @@
                 <property name="can_focus">True</property>
                 <property name="width_chars">4</property>
                 <property name="xalign">1</property>
+                <property name="climb_rate">0.050000000000000003</property>
                 <property name="digits">2</property>
                 <property name="snap_to_ticks">True</property>
                 <property name="numeric">True</property>
@@ -348,6 +349,7 @@
                     <property name="max_length">4</property>
                     <property name="width_chars">4</property>
                     <property name="xalign">1</property>
+                    <property name="climb_rate">20</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
                   </object>
@@ -378,6 +380,7 @@
                     <property name="max_length">4</property>
                     <property name="width_chars">4</property>
                     <property name="xalign">1</property>
+                    <property name="climb_rate">20</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
                   </object>
@@ -446,6 +449,7 @@
                     <property name="max_length">4</property>
                     <property name="width_chars">4</property>
                     <property name="xalign">1</property>
+                    <property name="climb_rate">20</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
                   </object>
@@ -476,6 +480,7 @@
                     <property name="max_length">4</property>
                     <property name="width_chars">4</property>
                     <property name="xalign">1</property>
+                    <property name="climb_rate">20</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
                   </object>
