@@ -1,0 +1,9 @@
+[Plugin]
+Loader=python
+Module=desktop-art
+IAge=1
+Name=Desktop Art
+Description=Show album art and controls on the desktop, requires a composite manager.
+Authors=Mathias Nedrebø <mathias@nedrebo.org>
+Copyright=Copyright © 2008 Mathias Nedrebø
+Website=http://www.nedrebo.org/code/rhythmbox_desktop_art/
