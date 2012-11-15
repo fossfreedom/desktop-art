@@ -10,6 +10,7 @@
     <property name="focus_on_map">False</property>
     <property name="decorated">False</property>
     <property name="deletable">False</property>
+    <property name="has-resize-grip">False</property>
     <child>
       <placeholder/>
     </child>
