@@ -71,7 +71,7 @@ def reread_GConf_value(conf, keys, key):
         read_GConf_values(conf, [key])
 
 class _ContextMenu(Gtk.Menu):
-    def __init__(self, desktop_control, configure_glade_file, shell):
+    def __init__(self, desktop_control, configure_glade_file, shell, plugin):
         Gtk.Menu.__init__(self)
         self.shell = shell
 
@@ -82,9 +82,11 @@ class _ContextMenu(Gtk.Menu):
 
         self.add(Gtk.SeparatorMenuItem())
 
-        preferences = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
-        #conf_dialog = ConfigDialog(configure_glade_file, GConf_plugin_path, self)
-        #preferences.connect('activate', self.show_preferences_dialog, desktop_control, configure_glade_file)
+        #preferences = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
+        preferences = Gtk.MenuItem.new_with_label('Preferences')
+        #preferences.set_label('gtk-properties')
+        self.conf_dialog = ConfigDialog(configure_glade_file, GConf_plugin_path, self, plugin)
+        preferences.connect('activate', self.show_preferences_dialog, desktop_control, configure_glade_file)
         self.add(preferences)
 
         self.show_all()
@@ -97,19 +99,20 @@ class _ContextMenu(Gtk.Menu):
         self.shell.props.visibility = menu_item.get_active()
 
     def show_preferences_dialog(self, menu_item, desktop_control, configure_glade_file):
-        conf_dialog = ConfigDialog(configure_glade_file, GConf_plugin_path, desktop_control)
-        conf_dialog.run()
+        #conf_dialog = ConfigDialog(configure_glade_file, GConf_plugin_path, desktop_control)
+        self.conf_dialog.run()
 
 class DesktopControl(Gtk.DrawingArea):
-    def __init__(self, icons, shell, player, conf_glade):
+    def __init__(self, icons, shell, player, conf_glade, plugin):
         Gtk.DrawingArea.__init__(self)
         #self.connect("expose_event", self.expose)
         self.connect("draw", self.draw_cb)
         self.shell = shell
+        self.plugin = plugin
         self.cover_image = CoverImage(icons)
         self.song_info = SongInfo()
         self.desktop_buttons = DesktopButtons(icons, player)
-        self.context_menu = _ContextMenu(self, conf_glade, shell)
+        self.context_menu = _ContextMenu(self, conf_glade, shell, plugin)
 
         self.draw_border = False
 
@@ -193,12 +196,8 @@ class DesktopControl(Gtk.DrawingArea):
         print "draw"
         # Clear cairo context
         cc.set_source_rgba(0, 0, 0, 0)
-        #cc.set_source_rgba(.2, .2, .2, 0.9)
         cc.set_operator(cairo.OPERATOR_SOURCE)
         cc.paint()
-        #cc.set_operator(cairo.OPERATOR_OVER)
- 
-    #def remaining(self, cc):
         # Scale the context so that the cover image area is 1 x 1
         rect = self.get_allocation()
         if self.conf['draw_reflection']:

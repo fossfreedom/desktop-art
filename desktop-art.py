@@ -67,7 +67,8 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             window.stick()
             window.set_keep_below(True)
 
-            desktop_control = DesktopControl(icons, self.shell, player, rb.find_plugin_file(self,'configure-art.ui'))
+            desktop_control = DesktopControl(icons, self.shell, player, 
+				rb.find_plugin_file(self,'configure-art.ui'), self)
             cover_manager = CoverManager(player.props.db)
             #player.props.db.connect_after("entry-extra-metadata-notify::rb:coverArt-uri", self.notify_metadata)
 
@@ -97,7 +98,7 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             self.position_window(self.window_props)
             self.window.show_all()
         else:
-            # We don't have compisiting
+            # We don't have compositing manager
             md = Gtk.MessageDialog(type=Gtk.MessageType.ERROR,
                                    buttons=Gtk.ButtonsType.OK,
                                    message_format='You are not running under a composited desktop-environment. The Desktop Art Plugin cannot work without one.')

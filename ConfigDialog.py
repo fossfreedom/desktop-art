@@ -18,7 +18,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from gi.repository import Gtk, GConf
+from gi.repository import Gtk, GConf, Gdk
+import rb
 
 widget_names = ['main_area',
                 'roundness',
@@ -28,33 +29,36 @@ widget_names = ['main_area',
                 'text_position_nw', 'text_position_ne', 'text_position_sw', 'text_position_se']
 
 class ConfigDialog(Gtk.Dialog):
-    def __init__(self, glade_file, GConf_plugin_path, desktop_control):
-        Gtk.Dialog.__init__(self, buttons=(Gtk.STOCK_OK, Gtk.RESPONSE_ACCEPT))
+    def __init__(self, glade_file, GConf_plugin_path, desktop_control, plugin):
+        Gtk.Dialog.__init__(self, buttons=(Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         self.set_title("Desktop Art preferences")
-        self.set_has_separator(False)
+        #self.set_has_separator(False)
 
         self.connect("response", lambda w, e: w.hide())
-        self.connect("response", lambda w, e: self.desktop_control.set_draw_border(False))
+        #self.connect("response", lambda w, e: self.desktop_control.set_draw_border(False))
 
         self.gc = GConf.Client.get_default()
-
+        self.GConf_plugin_path = GConf_plugin_path
+        self.desktop_control = desktop_control
+        self.plugin = plugin
+        
         self.widgets = {}
         self.get_widgets(self.widgets, glade_file)
         self.set_callbacks(self.widgets)
 
         self.vbox.add(self.widgets['main_area'])
         self.widgets['main_area'].set_border_width(6)
-        self.GConf_plugin_path = GConf_plugin_path
-        self.desktop_control = desktop_control
+        
         self.set_resizable(False)
 
     def get_widgets(self, w, glade_file):
-        gxml  = Gtk.glade.XML(glade_file)
+        ui  = Gtk.Builder()
+        ui.add_from_file(rb.find_plugin_file(self.plugin, glade_file))
         for name in widget_names:
-            w[name] = gxml.get_widget(name)
+            w[name] = ui.get_object(name)
 
     def present(self):
-        self.desktop_control.set_draw_border(True)
+        #self.desktop_control.set_draw_border(True)
         self.get_GConf_values(self.widgets)
 
     def run(self):
@@ -81,10 +85,11 @@ class ConfigDialog(Gtk.Dialog):
                     w[name].set_active(True)
             elif isinstance(w[name], Gtk.ColorButton):
                 rgba = self.gc.get_string(self.GConf_path(name))
-                rgb = Gtk.gdk.color_parse(rgba[:-4])
+                #rgb = Gtk.gdk.color_parse(rgba[:-4])
+                rgb = Gdk.Color.parse(rgba[:-4])
                 a = int(rgba[-4:], 16)
-                w[name].set_color(rgb)
-                w[name].set_alpha(a)
+                #w[name].set_color(rgb)  still to do
+                #w[name].set_alpha(a)    still to do
 
     def set_GConf_value(self, w, key):
         if isinstance(w, Gtk.SpinButton):
