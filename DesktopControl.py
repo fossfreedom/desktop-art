@@ -192,12 +192,13 @@ class DesktopControl(Gtk.DrawingArea):
     def draw(self, cc):
         print "draw"
         # Clear cairo context
-        #cc.set_source_rgba(0, 0, 0, 0)
-        cc.set_source_rgba(.2, .2, .2, 0.9)
+        cc.set_source_rgba(0, 0, 0, 0)
+        #cc.set_source_rgba(.2, .2, .2, 0.9)
         cc.set_operator(cairo.OPERATOR_SOURCE)
         cc.paint()
         #cc.set_operator(cairo.OPERATOR_OVER)
  
+    #def remaining(self, cc):
         # Scale the context so that the cover image area is 1 x 1
         rect = self.get_allocation()
         if self.conf['draw_reflection']:
