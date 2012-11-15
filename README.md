@@ -11,8 +11,7 @@ rhythmbox v2.9x plugin to display the coverart and control rhythmbox from your d
 
 Current Situation
 
- - Basics do work
- - Right-click preference menu option to be ported to GTK3
+ - Basics do work - see To Do list below
  - Mouse focus control to be restricted to cover i.e. lines 276-284 commented out needs to be GTK3 converted.  Patches welcome!
 
 To Install
