@@ -23,11 +23,12 @@ from __future__ import division
 #import sys
 from gi.repository import GObject
 from gi.repository import Gtk, Pango, GdkPixbuf, Gdk, PangoCairo
-from gi.repository import GConf
+from gi.repository import gsetting
 from gi.repository import Rsvg
 import cairo
 from roundedrec import roundedrec
 from ConfigDialog import ConfigDialog
+import DefaultGSettingValues as gs
 
 # CONSTANTS
 
@@ -37,38 +38,26 @@ POSITION_NE = 'ne'
 POSITION_SW = 'sw'
 POSITION_SE = 'se'
 
-GConf_plugin_path = '/apps/rhythmbox/plugins/desktop-art'
-
 def get_icon_path(theme, name, size):
     icon = theme.lookup_icon(name, size, Gtk.IconLookupFlags.FORCE_SVG)
     return (icon and icon.get_filename())
 
-def GConf_path(key):
-    return '%s/%s' % (GConf_plugin_path, key)
 
-def read_GConf_values(values, keys):
-    gc = GConf.Client.get_default()
+def read_gsetting_values(values, keys):
+    gc = gs.gsetting()
     for key in keys:
-        val = gc.get_without_default(GConf_path(key))
-        if val:
-			if val.type == GConf.ValueType.FLOAT:
-				values[key] = val.get_float()
-			elif val.type == GConf.ValueType.INT:
-				values[key] = val.get_int()
-			elif val.type == GConf.ValueType.STRING:
-				values[key] = val.get_string()
-			elif val.type == GConf.ValueType.BOOL:
-				values[key] = val.get_bool()
-			# Parse color strings
-			if 'color' in key:
-				values['%s_r' % key] = int(values[key][ 1: 5], 16) / int('ffff', 16)
-				values['%s_g' % key] = int(values[key][ 5: 9], 16) / int('ffff', 16)
-				values['%s_b' % key] = int(values[key][ 9:13], 16) / int('ffff', 16)
-				values['%s_a' % key] = int(values[key][13:17], 16) / int('ffff', 16)
+        values[key] = gc[key]
+        
+        # Parse color strings
+        if 'color' in key:
+            values['%s_r' % key] = int(values[key][ 1: 5], 16) / int('ffff', 16)
+            values['%s_g' % key] = int(values[key][ 5: 9], 16) / int('ffff', 16)
+            values['%s_b' % key] = int(values[key][ 9:13], 16) / int('ffff', 16)
+            values['%s_a' % key] = int(values[key][13:17], 16) / int('ffff', 16)
 
-def reread_GConf_value(conf, keys, key):
+def reread_gsetting_value(conf, keys, key):
     if key in keys:
-        read_GConf_values(conf, [key])
+        read_gsetting_values(conf, [key])
 
 class _ContextMenu(Gtk.Menu):
     def __init__(self, desktop_control, configure_glade_file, shell, plugin):
@@ -82,10 +71,8 @@ class _ContextMenu(Gtk.Menu):
 
         self.add(Gtk.SeparatorMenuItem.new())
 
-        #preferences = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES)
         preferences = Gtk.MenuItem.new_with_label('Preferences')
-        #preferences.set_label('gtk-properties')
-        self.conf_dialog = ConfigDialog(configure_glade_file, GConf_plugin_path, self, plugin)
+        self.conf_dialog = ConfigDialog(configure_glade_file, gsetting_plugin_path, self, plugin)
         preferences.connect('activate', self.show_preferences_dialog, desktop_control, configure_glade_file)
         self.add(preferences)
 
@@ -99,13 +86,12 @@ class _ContextMenu(Gtk.Menu):
         self.shell.props.visibility = menu_item.get_active()
 
     def show_preferences_dialog(self, menu_item, desktop_control, configure_glade_file):
-        #conf_dialog = ConfigDialog(configure_glade_file, GConf_plugin_path, desktop_control)
+        #conf_dialog = ConfigDialog(configure_glade_file, gsetting_plugin_path, desktop_control)
         self.conf_dialog.run()
 
 class DesktopControl(Gtk.DrawingArea):
     def __init__(self, icons, shell, player, conf_glade, plugin):
         Gtk.DrawingArea.__init__(self)
-        #self.connect("expose_event", self.expose)
         self.connect("draw", self.draw_cb)
         self.shell = shell
         self.plugin = plugin
@@ -119,8 +105,7 @@ class DesktopControl(Gtk.DrawingArea):
         # Find and set up icon and font
         icon_theme = Gtk.IconTheme.get_default()
         icon_theme.connect('changed', self.icon_theme_changed, [self.cover_image, self.desktop_buttons])
-        gc = GConf.Client.get_default()
-        #gc.add_dir('/apps/nautilus/preferences', GConf.ClientPreloadType.PRELOAD_NONE)
+        #gc.add_dir('/apps/nautilus/preferences', gsetting.ClientPreloadType.PRELOAD_NONE)
         #gc.notify_add('/apps/nautilus/preferences/desktop_font', self.font_changed, [self.song_info])
 
         self.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
@@ -131,22 +116,22 @@ class DesktopControl(Gtk.DrawingArea):
         self.connect('motion-notify-event', self.mouse_motion, self.desktop_buttons)
         self.connect('button-press-event', self.button_press, self.desktop_buttons)
 
-        self.GConf_keys = ['background_color', 'roundness', 'hover_size', 'border', 'draw_reflection', 'reflection_height', 'reflection_intensity', 'blur', 'text_position', 'text_font']
+        self.gsetting_keys = ['background_color', 'roundness', 'hover_size', 'border', 'draw_reflection', 'reflection_height', 'reflection_intensity', 'blur', 'text_position', 'text_font']
         self.conf = {}
-        read_GConf_values(self.conf, self.GConf_keys)
+        read_gsetting_values(self.conf, self.gsetting_keys)
 
-        self.set_GConf_callbacks([self, self.cover_image, self.song_info, self.desktop_buttons])
+        self.set_gsetting_callbacks([self, self.cover_image, self.song_info, self.desktop_buttons])
 
-    def set_GConf_callbacks(self, affected):
-        gc = GConf.Client.get_default()
-        for entry in gc.all_entries(GConf_plugin_path):
+    def set_gsetting_callbacks(self, affected):
+        gc = gs.gsetting()
+        for entry in gc.all_entries(gsetting_plugin_path):
             path = entry.get_key()
             key = path.split('/')[-1]
-            gc.notify_add(path, self.GConf_cb, {'key': key, 'affected': affected})
+            gc.notify_add(path, self.gsetting_cb, {'key': key, 'affected': affected})
 
-    def GConf_cb(self, client, cnxn_id, entry, ud):
+    def gsetting_cb(self, client, cnxn_id, entry, ud):
         for af in ud['affected']:
-            reread_GConf_value(af.conf, af.GConf_keys, ud['key'])
+            reread_gsetting_value(af.conf, af.gsetting_keys, ud['key'])
         self.queue_draw()
 
     def button_press(self, w, e, affected):
@@ -318,14 +303,14 @@ class SongInfo():
     tags = {'title'  : ['<big><b>', '</b></big>'],
             'artist' : ['<i>', '</i>'],
             'album'  : ['', '']}
-    #font = GConf.Client.get_default().get_string('/apps/nautilus/preferences/desktop_font')
+    #font = gsetting.Client.get_default().get_string('/apps/nautilus/preferences/desktop_font')
 
     def __init__(self, song_info=None):
         self.set_text(song_info)
 
-        self.GConf_keys = ['border', 'text_position', 'text_color', 'text_shadow_color', 'text_font']
+        self.gsetting_keys = ['border', 'text_position', 'text_color', 'text_shadow_color', 'text_font']
         self.conf = {}
-        read_GConf_values(self.conf, self.GConf_keys)
+        read_gsetting_values(self.conf, self.gsetting_keys)
         self.font_changed(_)
 
     def font_changed(self, font):
@@ -387,9 +372,9 @@ class DesktopButtons():
         self.icon_theme_changed(Gtk.IconTheme.get_default())
         self.playing = player.get_playing()
 
-        self.GConf_keys = ['roundness', 'hover_size', 'border', 'background_color']
+        self.gsetting_keys = ['roundness', 'hover_size', 'border', 'background_color']
         self.conf = {}
-        read_GConf_values(self.conf, self.GConf_keys)
+        read_gsetting_values(self.conf, self.gsetting_keys)
 
     def set_playing(self, playing):
         self.playing = playing
@@ -515,9 +500,9 @@ class CoverImage():
         self.icons = icons
         self.icon_theme_changed(Gtk.IconTheme.get_default())
 
-        self.GConf_keys = ['roundness', 'background_color']
+        self.gsetting_keys = ['roundness', 'background_color']
         self.conf = {}
-        read_GConf_values(self.conf, self.GConf_keys)
+        read_gsetting_values(self.conf, self.gsetting_keys)
 
     def icon_theme_changed(self, icon_theme):
         not_playing_image = get_icon_path(icon_theme, self.icons['not_playing'], self.icons['size'])

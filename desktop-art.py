@@ -20,15 +20,13 @@
 
 import rb
 from gi.repository import Gtk
-from gi.repository import GConf
 #import time
 from gi.repository import GObject
 from gi.repository import Peas
-
 from DesktopControl import DesktopControl
 from CoverManager import CoverManager
 from ConfigDialog import ConfigDialog
-import DefaultGConfValues
+import DefaultGSettingValues as gs
 
 #package needed gir1.2-rsvg-2.0
 
@@ -39,7 +37,6 @@ icons = {'previous'      : 'gtk-media-previous-ltr',
          'unknown_cover' : 'rhythmbox',
          'size'          : 500}
 
-GConf_plugin_path = '/apps/rhythmbox/plugins/desktop-art'
 POLL_TIMEOUT = 1000
 
 class DesktopArt(GObject.Object, Peas.Activatable):
@@ -72,13 +69,14 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             cover_manager = CoverManager(player.props.db)
             #player.props.db.connect_after("entry-extra-metadata-notify::rb:coverArt-uri", self.notify_metadata)
 
-            gc = GConf.Client.get_default()
-            window_props = self.get_GConf_window_props(gc)
+            gs.gsetting_defaults()
+            gc = gs.gsetting()
+            window_props = self.get_gsetting_window_props(gc)
 
-            self.gc_notify_ids = [gc.notify_add(self.GConf_path('window_x'), self.GConf_cb, window_props),
-                                  gc.notify_add(self.GConf_path('window_y'), self.GConf_cb, window_props),
-                                  gc.notify_add(self.GConf_path('window_w'), self.GConf_cb, window_props),
-                                  gc.notify_add(self.GConf_path('window_h'), self.GConf_cb, window_props)]
+            self.gc_notify_ids = [gc.notify_add(gc['window_x'], self.gsetting_cb, window_props),
+                                  gc.notify_add(gc['window_y'], self.gsetting_cb, window_props),
+                                  gc.notify_add(gc['window_w'], self.gsetting_cb, window_props),
+                                  gc.notify_add(gc['window_h'], self.gsetting_cb, window_props)]
 
             window.add(desktop_control)
             self.player = player
@@ -109,7 +107,7 @@ class DesktopArt(GObject.Object, Peas.Activatable):
         if self.composited:
             for i in self.gc_notify_ids:
                 self.gc.notify_remove(i)
-            self.set_GConf_window_props(self.gc, self.window)
+            self.set_gsetting_window_props(self.gc, self.window)
             self.window.destroy()
             self.player.disconnect(self.cb)
             del self.desktop_control
@@ -120,12 +118,6 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             del self.player
             del self.gc_notify_ids
         del self.composited
-
-    #def create_configure_dialog(self, dialog=None):
-    #    if not dialog:
-    #        dialog =  ConfigDialog(self.find_plugin_file(self, 'configure-art.glade'), GConf_plugin_path, self.desktop_control)
-    #        dialog.present()
-    #    return dialog
 
     # Add the poll object for new track
     def playing_changed(self, player, playing, desktop_control, cover_manager):
@@ -152,24 +144,21 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             c, s = self.cover_manager.get_cover_and_song_info(entry)
             self.desktop_control.set_song(self.player.get_playing(), c, s)
 
-    def GConf_path(self, key):
-        return '%s/%s' % (GConf_plugin_path, key)
+    def get_gsetting_window_props(self, gc):
+        return {'x' : gc['window_x'],
+                'y' : gc['window_y'],
+                'w' : gc['window_w'],
+                'h' : gc['window_h']}
 
-    def get_GConf_window_props(self, gc):
-        return {'x' : gc.get_int(self.GConf_path('window_x')),
-                'y' : gc.get_int(self.GConf_path('window_y')),
-                'w' : gc.get_int(self.GConf_path('window_w')),
-                'h' : gc.get_int(self.GConf_path('window_h'))}
-
-    def set_GConf_window_props(self, gc, window):
+    def set_gsetting_window_props(self, gc, window):
         x, y = window.get_position()
         w, h = window.get_size()
-        gc.set_int(self.GConf_path('window_x'), x)
-        gc.set_int(self.GConf_path('window_y'), y)
-        gc.set_int(self.GConf_path('window_w'), w)
-        gc.set_int(self.GConf_path('window_h'), h)
+        gc['window_x'] = x
+        gc['window_y'] = y
+        gc['window_w'] = w
+        gc['window_h'] = h
 
-    def GConf_cb(self, client, cnxn_id, entry, wp):
+    def gsetting_cb(self, client, cnxn_id, entry, wp):
         k = entry.get_key().split('_')[-1]
         wp[k] = entry.get_value().get_int()
         self.position_window(wp)

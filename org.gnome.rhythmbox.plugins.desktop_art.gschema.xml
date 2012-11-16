@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema path="/org/gnome/rhythmbox/plugins/desktop_art/" id="org.gnome.rhythmbox.plugins.desktop_art">
+        <key type="d" name="roundness">
+            <default>0.3</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="s" name="background-color">
+            <default>"#0000000000004ccc"</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="s" name="text-color">
+            <default>"#ffffffffffffb332"</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="s" name="text-shadow-color">
+            <default>"#000000000000b332"</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="b" name="draw-reflection">
+            <default>true</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="i" name="window-x">
+            <default>50</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="i" name="window-y">
+            <default>-1</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="i" name="window-w">
+            <default>-1</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="i" name="window-h">
+            <default>190</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="s" name="text-position">
+            <default>"se"</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="i" name="blur">
+            <default>1</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="d" name="reflection-height">
+            <default>0.4</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="d" name="reflection-intensity">
+            <default>0.4</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="d" name="hover-size">
+            <default>0.7</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="d" name="border">
+            <default>0.06</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+        <key type="s" name="text-font">
+            <default>"Normal"</default>
+            <summary>.</summary>
+            <description>.</description>
+        </key>
+    </schema>
+</schemalist>

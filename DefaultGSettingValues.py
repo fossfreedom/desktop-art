@@ -18,9 +18,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from gi.repository import Gtk, GConf, Gdk
+from gi.repository import Gdk
 
-GConf_plugin_path = '/apps/rhythmbox/plugins/desktop-art/'
+gsetting_plugin_path = 'org.gnome.rhythmbox.plugins.desktop_art'
 
 defaults = {'roundness'            : 0.3,
             'background_color'     : '#0000000000004ccc',
@@ -39,21 +39,33 @@ defaults = {'roundness'            : 0.3,
             'border'               : 0.06,
             'text_font'            : 'Normal'}
 
-def GConf_path(key):
-    return '%s%s' % (GConf_plugin_path, key)
+def gsetting():
+    return Gio.Settings(gsetting_plugin_path)
 
-gc = GConf.Client.get_default()
+def gsetting_path(key):
+    setting = gsetting()
+    return setting[key] #'%s%s' % (gsetting_plugin_path, key)
 
-for key, val in defaults.items():
-    path = GConf_path(key)
-    if gc.get_without_default(path) == None:
-        if isinstance(val, bool):
-            gc.set_bool(path, val)
-        elif isinstance(val, int):
-            gc.set_int(path, val)
-        elif isinstance(val, float):
-            gc.set_float(path, val)
-        elif isinstance(val, str):
-            gc.set_string(path, val)
-        else:
-            print 'Datatype %s is not supported' % type(val)
+def gsetting_defaults():
+    setting = gsetting()
+    if setting['window_y'] == -1:
+        setting['window_y'] = defaults['window_y']
+        
+    if setting['window_w'] == -1:
+        setting['window_w'] = defaults['window_w']
+
+#gc = GConf.Client.get_default()
+
+#for key, val in defaults.items():
+#path = GConf_path(key)
+#if gc.get_without_default(path) == None:
+#        if isinstance(val, bool):
+#            gc.set_bool(path, val)
+#        elif isinstance(val, int):
+#            gc.set_int(path, val)
+#        elif isinstance(val, float):
+#            gc.set_float(path, val)
+#        elif isinstance(val, str):
+#            gc.set_string(path, val)
+#        else:
+#            print 'Datatype %s is not supported' % type(val)
