@@ -282,7 +282,15 @@ class DesktopControl(Gtk.DrawingArea):
         #ccmask.fill()
         #self.get_parent().input_shape_combine_mask(pixmask, int(x_trans), 0)
         #suspect this should be Gdk.input_shape_combine_region (pixmask, int(x_trans), 0)
-        
+
+        surface = cairo.ImageSurface(cairo.FORMAT_A1, int(cover_area_size), int(cover_area_size))
+        ccmask = cairo.Context(surface)
+        roundedrec(ccmask, 0, 0, cover_area_size, cover_area_size, self.conf['roundness'])
+        ccmask.fill()
+#        reg = Gdk.cairo_region_create_from_surface(surface)
+# this throws an error in ubuntu 12.04 - need to test on 12.10 to see if this works
+# i.e. https://bugs.launchpad.net/ubuntu/+source/pygobject/+bug/1028115
+#        self.get_parent().input_shape_combine_region(reg, int(x_trans), 0)
         # Draw border
         if self.draw_border:
             print "drawborder"
