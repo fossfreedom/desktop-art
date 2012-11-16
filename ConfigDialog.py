@@ -18,8 +18,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from gi.repository import Gtk, GConf, Gdk
+from gi.repository import Gtk, Gdk
 import rb
+import DefaultGSettingValues as gs
 
 widget_names = ['main_area',
                 'roundness',
@@ -30,7 +31,7 @@ widget_names = ['main_area',
                 'text_font']
 
 class ConfigDialog(Gtk.Dialog):
-    def __init__(self, glade_file, GConf_plugin_path, desktop_control, plugin):
+    def __init__(self, glade_file, desktop_control, plugin):
         Gtk.Dialog.__init__(self, buttons=(Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
         self.set_title("Desktop Art preferences")
         #self.set_has_separator(False)
@@ -38,8 +39,7 @@ class ConfigDialog(Gtk.Dialog):
         self.connect("response", lambda w, e: w.hide())
         #self.connect("response", lambda w, e: self.desktop_control.set_draw_border(False))
 
-        self.gc = GConf.Client.get_default()
-        self.GConf_plugin_path = GConf_plugin_path
+        self.gc = gs.gsetting()
         self.desktop_control = desktop_control
         self.plugin = plugin
         
@@ -60,69 +60,66 @@ class ConfigDialog(Gtk.Dialog):
 
     def present(self):
         #self.desktop_control.set_draw_border(True)
-        self.get_GConf_values(self.widgets)
+        self.get_gsetting_values(self.widgets)
 
     def run(self):
         self.present()
         self.show_all()
 
-    def get_GConf_values(self, w):
+    def get_gsetting_values(self, w):
         for name in widget_names:
             if isinstance(w[name], Gtk.SpinButton):
                 if w[name].get_digits() == 0:
-                    value = self.gc.get_int(self.GConf_path(name))
+                    value = self.gc.get_int(self.gsetting_path(name))
                 else:
-                    value = self.gc.get_float(self.GConf_path(name))
+                    value = self.gc.get_float(self.gsetting_path(name))
                 if value:
                     w[name].set_value(value)
             elif isinstance(w[name], Gtk.RadioButton):
                 key, val = name.rsplit('_', 1)
-                w[name].set_active(self.gc.get_string(self.GConf_path(key)) == val)
+                w[name].set_active(self.gc.get_string(self.gsetting_path(key)) == val)
             elif isinstance(w[name], Gtk.CheckButton):
-                value = self.gc.get_without_default(self.GConf_path(name))
+                value = self.gc.get_without_default(self.gsetting_path(name))
                 if value:
                     w[name].set_active(value.get_bool())
                 else:
                     w[name].set_active(True)
             elif isinstance(w[name], Gtk.ColorButton):
-                rgba = self.gc.get_string(self.GConf_path(name))
+                rgba = self.gc.get_string(self.gsetting_path(name))
                 _, color = Gdk.Color.parse( rgba[:-4] )
                 a = int(rgba[-4:], 16)
                 w[name].set_color(color)  
                 w[name].set_alpha(a)
             elif isinstance(w[name], Gtk.FontButton):
-                fontname = self.gc.get_string(self.GConf_path(name))
+                fontname = self.gc.get_string(self.gsetting_path(name))
                 w[name].set_font_name(fontname)
 
-    def set_GConf_value(self, w, key):
+    def set_gsetting_value(self, w, key):
         if isinstance(w, Gtk.SpinButton):
             if w.get_digits() == 0:
-                self.gc.set_int(self.GConf_path(key), int(w.get_value()))
+                self.gc.set_int(self.gsetting_path(key), int(w.get_value()))
             else:
-                self.gc.set_float(self.GConf_path(key), w.get_value())
+                self.gc.set_float(self.gsetting_path(key), w.get_value())
         elif isinstance(w, Gtk.RadioButton):
             if w.get_active():
                 key, val = key.rsplit('_', 1)
-                self.gc.set_string(self.GConf_path(key), val)
+                self.gc.set_string(self.gsetting_path(key), val)
         elif isinstance(w, Gtk.CheckButton):
-            self.gc.set_bool(self.GConf_path(key), int(w.get_active()))
+            self.gc.set_bool(self.gsetting_path(key), int(w.get_active()))
         elif isinstance(w, Gtk.ColorButton):
-            self.gc.set_string(self.GConf_path(key),
+            self.gc.set_string(self.gsetting_path(key),
                                '%s%s' % (w.get_color().to_string(), hex(w.get_alpha())[2:]))
         elif isinstance(w, Gtk.FontButton):
-            self.gc.set_string(self.GConf_path(key),
+            self.gc.set_string(self.gsetting_path(key),
                                '%s' % (w.get_font_name()))
 
     def set_callbacks(self, w):
         for name in widget_names:
             if isinstance(w[name], Gtk.SpinButton):
-                w[name].connect('value-changed', self.set_GConf_value, name)
+                w[name].connect('value-changed', self.set_gsetting_value, name)
             elif isinstance(w[name], Gtk.CheckButton) or isinstance(w[name], Gtk.RadioButton):
-                w[name].connect('toggled', self.set_GConf_value, name)
+                w[name].connect('toggled', self.set_gsetting_value, name)
             elif isinstance(w[name], Gtk.ColorButton):
-                w[name].connect('color-set', self.set_GConf_value, name)
+                w[name].connect('color-set', self.set_gsetting_value, name)
             elif isinstance(w[name], Gtk.FontButton):
-                w[name].connect('font-set', self.set_GConf_value, name)
-
-    def GConf_path(self, key):
-        return '%s/%s' % (self.GConf_plugin_path, key)
+                w[name].connect('font-set', self.set_gsetting_value, name)

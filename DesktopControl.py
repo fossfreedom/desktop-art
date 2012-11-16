@@ -23,7 +23,6 @@ from __future__ import division
 #import sys
 from gi.repository import GObject
 from gi.repository import Gtk, Pango, GdkPixbuf, Gdk, PangoCairo
-from gi.repository import gsetting
 from gi.repository import Rsvg
 import cairo
 from roundedrec import roundedrec
@@ -72,7 +71,7 @@ class _ContextMenu(Gtk.Menu):
         self.add(Gtk.SeparatorMenuItem.new())
 
         preferences = Gtk.MenuItem.new_with_label('Preferences')
-        self.conf_dialog = ConfigDialog(configure_glade_file, gsetting_plugin_path, self, plugin)
+        self.conf_dialog = ConfigDialog(configure_glade_file, self, plugin)
         preferences.connect('activate', self.show_preferences_dialog, desktop_control, configure_glade_file)
         self.add(preferences)
 
@@ -116,7 +115,9 @@ class DesktopControl(Gtk.DrawingArea):
         self.connect('motion-notify-event', self.mouse_motion, self.desktop_buttons)
         self.connect('button-press-event', self.button_press, self.desktop_buttons)
 
-        self.gsetting_keys = ['background_color', 'roundness', 'hover_size', 'border', 'draw_reflection', 'reflection_height', 'reflection_intensity', 'blur', 'text_position', 'text_font']
+        self.gsetting_keys = ['background-color', 'roundness', 'hover-size',
+            'border', 'draw-reflection', 'reflection-height', 'reflection-intensity',
+            'blur', 'text-position', 'text-font']
         self.conf = {}
         read_gsetting_values(self.conf, self.gsetting_keys)
 
@@ -124,14 +125,19 @@ class DesktopControl(Gtk.DrawingArea):
 
     def set_gsetting_callbacks(self, affected):
         gc = gs.gsetting()
-        for entry in gc.all_entries(gsetting_plugin_path):
-            path = entry.get_key()
-            key = path.split('/')[-1]
-            gc.notify_add(path, self.gsetting_cb, {'key': key, 'affected': affected})
+        for entry in self.gsetting_keys: #gc.all_entries(gsetting_plugin_path):
+            #path = entry.get_key()
+            #key = path.split('/')[-1]
+            #gc.notify_add(path, self.gsetting_cb, {'key': key, 'affected': affected})
+            #gc.bind(entry, self.gsetting_keys[entry],
+            #'entry', Gio.SettingsBindFlags.GET)
+            self.connect('notify::'+entry,
+            self.gsetting_cb, entry)
 
-    def gsetting_cb(self, client, cnxn_id, entry, ud):
-        for af in ud['affected']:
-            reread_gsetting_value(af.conf, af.gsetting_keys, ud['key'])
+
+    def gsetting_cb(self, entry):
+        
+        reread_gsetting_value(self.conf, self.gsetting_keys, entry)
         self.queue_draw()
 
     def button_press(self, w, e, affected):
@@ -175,12 +181,14 @@ class DesktopControl(Gtk.DrawingArea):
         cc.paint()
         # Scale the context so that the cover image area is 1 x 1
         rect = self.get_allocation()
-        if self.conf['draw_reflection']:
-            cover_area_size = min(rect.width - self.conf['blur']/2, (rect.height - self.conf['blur']/2) / (1 + self.conf['reflection_height']))
+        if self.conf['draw-reflection']:
+            cover_area_size = min(rect.width - self.conf['blur']/2,
+                (rect.height - self.conf['blur']/2) / (1 + self.conf['reflection-height']))
         else:
-            cover_area_size = min(rect.width - self.conf['blur']/2, (rect.height - self.conf['blur']/2))
+            cover_area_size = min(rect.width - self.conf['blur']/2,
+                (rect.height - self.conf['blur']/2))
 
-        if self.conf['text_position'] in [POSITION_SW, POSITION_NW]:
+        if self.conf['text-position'] in [POSITION_SW, POSITION_NW]:
             x_trans = int(round(rect.width - cover_area_size - self.conf['blur']/2))
         else:
             x_trans = int(round(self.conf['blur']/2))
@@ -195,9 +203,9 @@ class DesktopControl(Gtk.DrawingArea):
             print "mouseover"
             self.desktop_buttons.draw(cc)
             cc.save()
-            cc.translate((1 - self.conf['hover_size']) / 2, self.conf['border'])
-            cc.scale(self.conf['hover_size'], self.conf['hover_size'])
-        if (self.conf['text_position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
+            cc.translate((1 - self.conf['hover-size']) / 2, self.conf['border'])
+            cc.scale(self.conf['hover-size'], self.conf['hover-size'])
+        if (self.conf['text-position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
             if(self.cover_image.w > self.cover_image.h):
                 print "text"
                 cc.save()
@@ -205,7 +213,7 @@ class DesktopControl(Gtk.DrawingArea):
 
         print "cover_image"
         self.cover_image.draw(cc, cover_area_size)
-        if (self.conf['text_position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
+        if (self.conf['text-position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
             if(self.cover_image.w > self.cover_image.h):
                 print "restore"
                 cc.restore()
@@ -222,12 +230,12 @@ class DesktopControl(Gtk.DrawingArea):
 
         print "paint"
         # Draw reflections
-        if self.conf['draw_reflection']:
-            print "draw_reflection"
+        if self.conf['draw-reflection']:
+            print "draw-reflection"
             cc.save()
             cc.set_operator(cairo.OPERATOR_ADD)
             cc.translate(0, 2.02)
-            if (self.conf['text_position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
+            if (self.conf['text-position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
                 if(self.cover_image.w > self.cover_image.h):
                     cc.save()
                     cc.translate(0, 2 * (self.cover_image.h - self.cover_image.w) / self.cover_image.w)
@@ -248,11 +256,11 @@ class DesktopControl(Gtk.DrawingArea):
                     print "xrange"
             graphics = cc.pop_group()
             cc.set_source(graphics)
-            shadow_mask = cairo.LinearGradient(0, 1 - self.conf['reflection_height'], 0, 1)
+            shadow_mask = cairo.LinearGradient(0, 1 - self.conf['reflection-height'], 0, 1)
             shadow_mask.add_color_stop_rgba(0, 0, 0, 0, 0)
-            shadow_mask.add_color_stop_rgba(1, 0, 0, 0, self.conf['reflection_intensity'])
+            shadow_mask.add_color_stop_rgba(1, 0, 0, 0, self.conf['reflection-intensity'])
             cc.mask(shadow_mask)
-            if (self.conf['text_position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
+            if (self.conf['text-position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
                 if(self.cover_image.w > self.cover_image.h):
                     cc.restore()
                     print "another restore"
@@ -308,13 +316,14 @@ class SongInfo():
     def __init__(self, song_info=None):
         self.set_text(song_info)
 
-        self.gsetting_keys = ['border', 'text_position', 'text_color', 'text_shadow_color', 'text_font']
+        self.gsetting_keys = ['border', 'text-position', 'text-color', 'text-shadow-color',
+            'text-font']
         self.conf = {}
         read_gsetting_values(self.conf, self.gsetting_keys)
         self.font_changed(_)
 
     def font_changed(self, font):
-        self.font = self.conf['text_font']
+        self.font = self.conf['text-font']
 
     def set_text(self, song_info):
         self.text = ''
@@ -335,13 +344,13 @@ class SongInfo():
             layout.set_markup(self.text)
             layout.set_font_description(Pango.FontDescription(self.font))
             txw, txh = layout.get_size()
-            if self.conf['text_position'] in [POSITION_SW, POSITION_NW]:
+            if self.conf['text-position'] in [POSITION_SW, POSITION_NW]:
                 x_trans = x_trans - txw / Pango.SCALE - x_scale * self.conf['border']
                 layout.set_alignment(Pango.Alignment.RIGHT)
             else:
                 x_trans = x_trans + x_scale * (1 + self.conf['border'])
                 layout.set_alignment(Pango.Alignment.LEFT)
-            if self.conf['text_position'] in [POSITION_NE, POSITION_NW]:
+            if self.conf['text-position'] in [POSITION_NE, POSITION_NW]:
                 y_trans = x_scale * self.conf['border'] / 2
             else:
                 y_trans = x_scale * (1 - self.conf['border'] / 2) - txh / Pango.SCALE
@@ -372,7 +381,7 @@ class DesktopButtons():
         self.icon_theme_changed(Gtk.IconTheme.get_default())
         self.playing = player.get_playing()
 
-        self.gsetting_keys = ['roundness', 'hover_size', 'border', 'background_color']
+        self.gsetting_keys = ['roundness', 'hover-size', 'border', 'background-color']
         self.conf = {}
         read_gsetting_values(self.conf, self.gsetting_keys)
 
@@ -500,7 +509,7 @@ class CoverImage():
         self.icons = icons
         self.icon_theme_changed(Gtk.IconTheme.get_default())
 
-        self.gsetting_keys = ['roundness', 'background_color']
+        self.gsetting_keys = ['roundness', 'background-color']
         self.conf = {}
         read_gsetting_values(self.conf, self.gsetting_keys)
 
@@ -545,17 +554,12 @@ class CoverImage():
             self.x = (self.dim - self.w) / 2
             self.y = self.dim - self.h
             self.scale = 1 / self.dim
-            print self.scale
-            print self.dim
-            print self.w
-            print self.h
-            print self.x
-            print self.y
         self.current_image = image
 
     def draw_background(self, cc, size = None):
         cc.save()
-        cc.set_source_rgba(self.conf['background_color_r'], self.conf['background_color_g'], self.conf['background_color_b'], self.conf['background_color_a'])
+        cc.set_source_rgba(self.conf['background_color_r'], self.conf['background_color_g'],
+            self.conf['background_color_b'], self.conf['background_color_a'])
         roundedrec(cc, 0, 0, 1, 1, self.conf['roundness'])
         cc.fill()
         cc.restore()
@@ -566,7 +570,10 @@ class CoverImage():
         cc.scale(self.scale, self.scale)
         cc.push_group()
         cc.set_operator(cairo.OPERATOR_OVER)
-        cc.set_source_rgba(self.conf['background_color_r'], self.conf['background_color_g'], self.conf['background_color_b'], self.conf['background_color_a'])
+        print "here"
+        cc.set_source_rgba(self.conf['background_color_r'], self.conf['background_color_g'],
+            self.conf['background_color_b'], self.conf['background_color_a'])
+        print "here"
         cc.paint()
         cc.translate(self.x, self.y)
         self.image.render_cairo(cc)
@@ -583,7 +590,8 @@ class CoverImage():
         cc.set_operator(cairo.OPERATOR_SOURCE)
         cc.scale(self.scale, self.scale)
         roundedrec(cc, self.x, self.y, self.w, self.h, self.conf['roundness'])
-        cc.set_source_rgba(self.conf['background_color_r'], self.conf['background_color_g'], self.conf['background_color_b'], self.conf['background_color_a'])
+        cc.set_source_rgba(self.conf['background_color_r'], self.conf['background_color_g'],
+            self.conf['background_color_b'], self.conf['background_color_a'])
         cc.fill_preserve()
         cc.set_operator(cairo.OPERATOR_OVER)
         cc.scale(1/img_scale, 1/img_scale)

@@ -73,10 +73,10 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             gc = gs.gsetting()
             window_props = self.get_gsetting_window_props(gc)
 
-            self.gc_notify_ids = [gc.notify_add(gc['window_x'], self.gsetting_cb, window_props),
-                                  gc.notify_add(gc['window_y'], self.gsetting_cb, window_props),
-                                  gc.notify_add(gc['window_w'], self.gsetting_cb, window_props),
-                                  gc.notify_add(gc['window_h'], self.gsetting_cb, window_props)]
+            #self.gc_notify_ids = [gc.notify_add(gc['window-x'], self.gsetting_cb, window_props),
+            #                      gc.notify_add(gc['window-y'], self.gsetting_cb, window_props),
+            #                      gc.notify_add(gc['window-w'], self.gsetting_cb, window_props),
+            #                      gc.notify_add(gc['window-h'], self.gsetting_cb, window_props)]
 
             window.add(desktop_control)
             self.player = player
@@ -145,18 +145,18 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             self.desktop_control.set_song(self.player.get_playing(), c, s)
 
     def get_gsetting_window_props(self, gc):
-        return {'x' : gc['window_x'],
-                'y' : gc['window_y'],
-                'w' : gc['window_w'],
-                'h' : gc['window_h']}
+        return {'x' : gc['window-x'],
+                'y' : gc['window-y'],
+                'w' : gc['window-w'],
+                'h' : gc['window-h']}
 
     def set_gsetting_window_props(self, gc, window):
         x, y = window.get_position()
         w, h = window.get_size()
-        gc['window_x'] = x
-        gc['window_y'] = y
-        gc['window_w'] = w
-        gc['window_h'] = h
+        gc['window-x'] = x
+        gc['window-y'] = y
+        gc['window-w'] = w
+        gc['window-h'] = h
 
     def gsetting_cb(self, client, cnxn_id, entry, wp):
         k = entry.get_key().split('_')[-1]

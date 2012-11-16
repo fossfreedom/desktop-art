@@ -18,26 +18,26 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from gi.repository import Gdk
+from gi.repository import Gdk, Gio
 
 gsetting_plugin_path = 'org.gnome.rhythmbox.plugins.desktop_art'
 
 defaults = {'roundness'            : 0.3,
-            'background_color'     : '#0000000000004ccc',
-            'text_color'           : '#ffffffffffffb332',
-            'text_shadow_color'    : '#000000000000b332',
-            'draw_reflection'      : True,
-            'window_x'             : 50,
-            'window_y'             : Gdk.Screen.height() - 190 - 40,
-            'window_w'             : Gdk.Screen.width() - 100,
-            'window_h'             : 190,
-            'text_position'        : 'se',
+            'background-color'     : '#0000000000004ccc',
+            'text-color'           : '#ffffffffffffb332',
+            'text-shadow-color'    : '#000000000000b332',
+            'draw-reflection'      : True,
+            'window-x'             : 50,
+            'window-y'             : Gdk.Screen.height() - 190 - 40,
+            'window-w'             : Gdk.Screen.width() - 100,
+            'window-h'             : 190,
+            'text-position'        : 'se',
             'blur'                 : 1,
-            'reflection_height'    : 0.4,
-            'reflection_intensity' : 0.4,
-            'hover_size'           : 0.7,
+            'reflection-height'    : 0.4,
+            'reflection-intensity' : 0.4,
+            'hover-size'           : 0.7,
             'border'               : 0.06,
-            'text_font'            : 'Normal'}
+            'text-font'            : 'Normal'}
 
 def gsetting():
     return Gio.Settings(gsetting_plugin_path)
@@ -48,11 +48,11 @@ def gsetting_path(key):
 
 def gsetting_defaults():
     setting = gsetting()
-    if setting['window_y'] == -1:
-        setting['window_y'] = defaults['window_y']
+    if setting['window-y'] == -1:
+        setting['window-y'] = defaults['window-y']
         
-    if setting['window_w'] == -1:
-        setting['window_w'] = defaults['window_w']
+    if setting['window-w'] == -1:
+        setting['window-w'] = defaults['window-w']
 
 #gc = GConf.Client.get_default()
 
