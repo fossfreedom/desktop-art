@@ -36,7 +36,8 @@ defaults = {'roundness'            : 0.3,
             'reflection_height'    : 0.4,
             'reflection_intensity' : 0.4,
             'hover_size'           : 0.7,
-            'border'               : 0.06}
+            'border'               : 0.06,
+            'text_font'            : 'Normal'}
 
 def GConf_path(key):
     return '%s%s' % (GConf_plugin_path, key)

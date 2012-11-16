@@ -120,8 +120,8 @@ class DesktopControl(Gtk.DrawingArea):
         icon_theme = Gtk.IconTheme.get_default()
         icon_theme.connect('changed', self.icon_theme_changed, [self.cover_image, self.desktop_buttons])
         gc = GConf.Client.get_default()
-        gc.add_dir('/apps/nautilus/preferences', GConf.ClientPreloadType.PRELOAD_NONE)
-        gc.notify_add('/apps/nautilus/preferences/desktop_font', self.font_changed, [self.song_info])
+        #gc.add_dir('/apps/nautilus/preferences', GConf.ClientPreloadType.PRELOAD_NONE)
+        #gc.notify_add('/apps/nautilus/preferences/desktop_font', self.font_changed, [self.song_info])
 
         self.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
         self.mouse_over = False
@@ -131,7 +131,7 @@ class DesktopControl(Gtk.DrawingArea):
         self.connect('motion-notify-event', self.mouse_motion, self.desktop_buttons)
         self.connect('button-press-event', self.button_press, self.desktop_buttons)
 
-        self.GConf_keys = ['background_color', 'roundness', 'hover_size', 'border', 'draw_reflection', 'reflection_height', 'reflection_intensity', 'blur', 'text_position']
+        self.GConf_keys = ['background_color', 'roundness', 'hover_size', 'border', 'draw_reflection', 'reflection_height', 'reflection_intensity', 'blur', 'text_position', 'text_font']
         self.conf = {}
         read_GConf_values(self.conf, self.GConf_keys)
 
@@ -318,17 +318,18 @@ class SongInfo():
     tags = {'title'  : ['<big><b>', '</b></big>'],
             'artist' : ['<i>', '</i>'],
             'album'  : ['', '']}
-    font = GConf.Client.get_default().get_string('/apps/nautilus/preferences/desktop_font')
+    #font = GConf.Client.get_default().get_string('/apps/nautilus/preferences/desktop_font')
 
     def __init__(self, song_info=None):
         self.set_text(song_info)
 
-        self.GConf_keys = ['border', 'text_position', 'text_color', 'text_shadow_color']
+        self.GConf_keys = ['border', 'text_position', 'text_color', 'text_shadow_color', 'text_font']
         self.conf = {}
         read_GConf_values(self.conf, self.GConf_keys)
+        self.font_changed(_)
 
     def font_changed(self, font):
-        self.font = font
+        self.font = self.conf['text_font']
 
     def set_text(self, song_info):
         self.text = ''

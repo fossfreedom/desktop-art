@@ -26,7 +26,8 @@ widget_names = ['main_area',
                 'background_color', 'text_color', 'text_shadow_color',
                 'draw_reflection',
                 'window_x', 'window_y', 'window_w', 'window_h',
-                'text_position_nw', 'text_position_ne', 'text_position_sw', 'text_position_se']
+                'text_position_nw', 'text_position_ne', 'text_position_sw', 'text_position_se',
+                'text_font']
 
 class ConfigDialog(Gtk.Dialog):
     def __init__(self, glade_file, GConf_plugin_path, desktop_control, plugin):
@@ -88,7 +89,10 @@ class ConfigDialog(Gtk.Dialog):
                 _, color = Gdk.Color.parse( rgba[:-4] )
                 a = int(rgba[-4:], 16)
                 w[name].set_color(color)  
-                w[name].set_alpha(a)    
+                w[name].set_alpha(a)
+            elif isinstance(w[name], Gtk.FontButton):
+                fontname = self.gc.get_string(self.GConf_path(name))
+                w[name].set_font_name(fontname)
 
     def set_GConf_value(self, w, key):
         if isinstance(w, Gtk.SpinButton):
@@ -105,6 +109,9 @@ class ConfigDialog(Gtk.Dialog):
         elif isinstance(w, Gtk.ColorButton):
             self.gc.set_string(self.GConf_path(key),
                                '%s%s' % (w.get_color().to_string(), hex(w.get_alpha())[2:]))
+        elif isinstance(w, Gtk.FontButton):
+            self.gc.set_string(self.GConf_path(key),
+                               '%s' % (w.get_font_name()))
 
     def set_callbacks(self, w):
         for name in widget_names:
@@ -114,6 +121,8 @@ class ConfigDialog(Gtk.Dialog):
                 w[name].connect('toggled', self.set_GConf_value, name)
             elif isinstance(w[name], Gtk.ColorButton):
                 w[name].connect('color-set', self.set_GConf_value, name)
+            elif isinstance(w[name], Gtk.FontButton):
+                w[name].connect('font-set', self.set_GConf_value, name)
 
     def GConf_path(self, key):
         return '%s/%s' % (self.GConf_plugin_path, key)
