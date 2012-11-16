@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAdjustment" id="adjustment_roundness">
+    <property name="upper">1</property>
+    <property name="step_increment">0.10000000000000001</property>
+    <property name="page_increment">0.10000000000000001</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustmenth">
+    <property name="upper">1000</property>
+    <property name="step_increment">20</property>
+    <property name="page_increment">20</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustmentw">
+    <property name="upper">1000</property>
+    <property name="step_increment">20</property>
+    <property name="page_increment">20</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustmentx">
+    <property name="upper">1000</property>
+    <property name="step_increment">20</property>
+    <property name="page_increment">20</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustmenty">
+    <property name="upper">1000</property>
+    <property name="step_increment">20</property>
+    <property name="page_increment">20</property>
+  </object>
   <object class="GtkVBox" id="main_area">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -20,6 +45,9 @@
             <property name="n_columns">3</property>
             <property name="column_spacing">4</property>
             <property name="row_spacing">3</property>
+            <child>
+              <placeholder/>
+            </child>
             <child>
               <object class="GtkColorButton" id="text_shadow_color">
                 <property name="use_action_appearance">False</property>
@@ -161,6 +189,7 @@
                 <property name="can_focus">True</property>
                 <property name="width_chars">4</property>
                 <property name="xalign">1</property>
+                <property name="adjustment">adjustment_roundness</property>
                 <property name="climb_rate">0.050000000000000003</property>
                 <property name="digits">2</property>
                 <property name="snap_to_ticks">True</property>
@@ -275,9 +304,6 @@
               </packing>
             </child>
             <child>
-              <placeholder/>
-            </child>
-            <child>
               <object class="GtkLabel" id="label1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -382,6 +408,7 @@
                     <property name="max_length">4</property>
                     <property name="width_chars">4</property>
                     <property name="xalign">1</property>
+                    <property name="adjustment">adjustmentx</property>
                     <property name="climb_rate">20</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
@@ -413,6 +440,7 @@
                     <property name="max_length">4</property>
                     <property name="width_chars">4</property>
                     <property name="xalign">1</property>
+                    <property name="adjustment">adjustmenty</property>
                     <property name="climb_rate">20</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
@@ -482,6 +510,7 @@
                     <property name="max_length">4</property>
                     <property name="width_chars">4</property>
                     <property name="xalign">1</property>
+                    <property name="adjustment">adjustmentw</property>
                     <property name="climb_rate">20</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>
@@ -513,6 +542,7 @@
                     <property name="max_length">4</property>
                     <property name="width_chars">4</property>
                     <property name="xalign">1</property>
+                    <property name="adjustment">adjustmenth</property>
                     <property name="climb_rate">20</property>
                     <property name="snap_to_ticks">True</property>
                     <property name="numeric">True</property>

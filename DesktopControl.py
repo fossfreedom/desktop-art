@@ -123,6 +123,8 @@ class DesktopControl(Gtk.DrawingArea):
         #gc.add_dir('/apps/nautilus/preferences', GConf.ClientPreloadType.PRELOAD_NONE)
         #gc.notify_add('/apps/nautilus/preferences/desktop_font', self.font_changed, [self.song_info])
 
+        gc.add_dir(GConf_plugin_path, GConf.ClientPreloadType.PRELOAD_NONE)
+        
         self.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
         self.mouse_over = False
         self.hover_time_out = None
@@ -136,6 +138,7 @@ class DesktopControl(Gtk.DrawingArea):
         read_GConf_values(self.conf, self.GConf_keys)
 
         self.set_GConf_callbacks([self, self.cover_image, self.song_info, self.desktop_buttons])
+        gc.notify_add(GConf_plugin_path+'/text_font', self.font_changed, [self.song_info])
 
     def set_GConf_callbacks(self, affected):
         gc = GConf.Client.get_default()
@@ -162,7 +165,8 @@ class DesktopControl(Gtk.DrawingArea):
 
     def font_changed(self, client, cnxn_id, entry, affected):
         for a in affected:
-            a.font_changed(entry.get_value().get_string())
+            #a.font_changed(entry.get_value().get_string())
+            a.font_changed(_)
         self.queue_draw()
 
     def icon_theme_changed(self, icon_theme, affected):

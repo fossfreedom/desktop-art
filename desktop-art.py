@@ -73,8 +73,9 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             #player.props.db.connect_after("entry-extra-metadata-notify::rb:coverArt-uri", self.notify_metadata)
 
             gc = GConf.Client.get_default()
+            gc.add_dir(GConf_plugin_path, GConf.ClientPreloadType.PRELOAD_NONE)
             window_props = self.get_GConf_window_props(gc)
-
+            
             self.gc_notify_ids = [gc.notify_add(self.GConf_path('window_x'), self.GConf_cb, window_props),
                                   gc.notify_add(self.GConf_path('window_y'), self.GConf_cb, window_props),
                                   gc.notify_add(self.GConf_path('window_w'), self.GConf_cb, window_props),
@@ -120,12 +121,6 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             del self.player
             del self.gc_notify_ids
         del self.composited
-
-    #def create_configure_dialog(self, dialog=None):
-    #    if not dialog:
-    #        dialog =  ConfigDialog(self.find_plugin_file(self, 'configure-art.glade'), GConf_plugin_path, self.desktop_control)
-    #        dialog.present()
-    #    return dialog
 
     # Add the poll object for new track
     def playing_changed(self, player, playing, desktop_control, cover_manager):
