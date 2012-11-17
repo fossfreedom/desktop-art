@@ -34,4 +34,4 @@ To Do:
  - GConf needs to be converted to GSettings
  - is the rsvg module really needed?  Need to investigate further and if necessary strip the rsvg code elemnents from the source.
  - Investigate the 1 second polling method to update the cover. Inefficient - possible use the standard playing-changed event to upate.
- - Preferences Dialog changes dont occur automatically - i.e. you have to deactivate and activate the plugin.
+ - Preferences Dialog - two or more increments to the x, y, w or h values causes a segmentation fault.
