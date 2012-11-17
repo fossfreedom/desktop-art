@@ -282,19 +282,19 @@ class DesktopControl(Gtk.DrawingArea):
 
         # Input mask, only the cover image is clickable
         # Will, (and should) only work if parent is Gtk.Window
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(cover_area_size), int(cover_area_size))
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(rect.width), int(rect.height))
         ccmask = cairo.Context(surface)
-        roundedrec(ccmask, 0, 0, cover_area_size, cover_area_size, self.conf['roundness'])
+        roundedrec(ccmask, int(x_trans), 0, cover_area_size, cover_area_size, self.conf['roundness'])
         ccmask.fill()
-# bug in python-cairo, upstream is patched, but only for python3-cairo
-# https://bugs.launchpad.net/ubuntu/+source/pygobject/+bug/1028115
-# https://bugzilla.gnome.org/show_bug.cgi?id=667959
-# https://bugs.freedesktop.org/show_bug.cgi?id=44336
-# for the moment wrap this into a try except so that it fails gracefully
-# need to test this on a distro patched and only running python3-cairo
+        # bug in python-cairo, upstream is patched, but only for python3-cairo
+        # https://bugs.launchpad.net/ubuntu/+source/pygobject/+bug/1028115
+        # https://bugzilla.gnome.org/show_bug.cgi?id=667959
+        # https://bugs.freedesktop.org/show_bug.cgi?id=44336
+        # for the moment wrap this into a try except so that it fails gracefully
+        # need to test this on a distro patched and only running python3-cairo
         try:
             region = Gdk.cairo_region_create_from_surface(surface)
-            self.get_parent().input_shape_combine_region(region, int(x_trans), 0)
+            self.get_parent().input_shape_combine_region(region)
         except:
             pass
             

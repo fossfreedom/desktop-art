@@ -35,3 +35,15 @@ To Do:
  - is the rsvg module really needed?  Need to investigate further and if necessary strip the rsvg code elemnents from the source.
  - Investigate the 1 second polling method to update the cover. Inefficient - possible use the standard playing-changed event to upate.
  - Preferences Dialog - two or more increments to the x, y, w or h values causes a segmentation fault.
+ 
+ 
+ **Bug #1028115 in pygobject**
+ 
+ To have full functionality, this bug needs to be fixed in the pygobject-Packages: 
+ https://bugs.launchpad.net/ubuntu/+source/pygobject/+bug/1028115
+ 
+ You can find scripts for Ubuntu 12.04/12.10 to patch the packages.
+ If you're running Ubuntu 12.04/12.10 AMD64, you can download the
+ resulting binaries as .deb packages.
+ 
+ see https://github.com/andrenam/desktop-art/downloads
