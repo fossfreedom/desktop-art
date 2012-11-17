@@ -2,6 +2,7 @@
 Loader=python
 Module=desktop-art
 IAge=2
+Depends=rb
 Name=Desktop Art
 Description=Show album art and controls on the desktop, requires a compositing manager.
 Authors=fossfreedom <foss.freedom@gmail.com>
