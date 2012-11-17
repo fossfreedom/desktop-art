@@ -130,9 +130,9 @@ class DesktopArt(GObject.Object, Peas.Activatable):
 
     # An ugly poll method which repeatedly wastes system resources
     def poll_for_coverart(self):
-        print "Polling for coverart"
+        #print "Polling for coverart"
         c, s = self.cover_manager.get_cover_and_song_info(self.player.get_playing_entry())
-        print "Cover art found: " + str(c)
+        #print "Cover art found: " + str(c)
         if c==-1 or c is None:
             return True
         else:

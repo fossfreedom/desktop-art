@@ -40,13 +40,16 @@ POSITION_SE = 'se'
 GConf_plugin_path = '/apps/rhythmbox/plugins/desktop-art'
 
 def get_icon_path(theme, name, size):
+    print "get_icon_path"
     icon = theme.lookup_icon(name, size, Gtk.IconLookupFlags.FORCE_SVG)
     return (icon and icon.get_filename())
 
 def GConf_path(key):
+    print "GConf_path"
     return '%s/%s' % (GConf_plugin_path, key)
 
 def read_GConf_values(values, keys):
+    print "read_GConf_values"
     gc = GConf.Client.get_default()
     for key in keys:
         val = gc.get_without_default(GConf_path(key))
@@ -67,6 +70,7 @@ def read_GConf_values(values, keys):
 				values['%s_a' % key] = int(values[key][13:17], 16) / int('ffff', 16)
 
 def reread_GConf_value(conf, keys, key):
+    print "reread_GConf_value"
     if key in keys:
         read_GConf_values(conf, [key])
 
@@ -123,7 +127,7 @@ class DesktopControl(Gtk.DrawingArea):
         #gc.add_dir('/apps/nautilus/preferences', GConf.ClientPreloadType.PRELOAD_NONE)
         #gc.notify_add('/apps/nautilus/preferences/desktop_font', self.font_changed, [self.song_info])
 
-        gc.add_dir(GConf_plugin_path, GConf.ClientPreloadType.PRELOAD_NONE)
+        #gc.add_dir(GConf_plugin_path, GConf.ClientPreloadType.PRELOAD_NONE)
         
         self.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
         self.mouse_over = False
@@ -141,14 +145,21 @@ class DesktopControl(Gtk.DrawingArea):
         gc.notify_add(GConf_plugin_path+'/text_font', self.font_changed, [self.song_info])
 
     def set_GConf_callbacks(self, affected):
+        print "set_GConf_callbacks"
         gc = GConf.Client.get_default()
         for entry in gc.all_entries(GConf_plugin_path):
+            print entry
             path = entry.get_key()
+            print path
             key = path.split('/')[-1]
+            print key
             gc.notify_add(path, self.GConf_cb, {'key': key, 'affected': affected})
+            print "end set_GConf_callbacks"
 
     def GConf_cb(self, client, cnxn_id, entry, ud):
+        print "GConf_cb"
         for af in ud['affected']:
+            print "affected"
             reread_GConf_value(af.conf, af.GConf_keys, ud['key'])
         self.queue_draw()
 
@@ -208,28 +219,22 @@ class DesktopControl(Gtk.DrawingArea):
         cc.scale(cover_area_size, cover_area_size)
 
         cc.push_group()
-        print "about"
         self.song_info.draw(cc)
         if self.mouse_over:
-            print "mouseover"
             self.desktop_buttons.draw(cc)
             cc.save()
             cc.translate((1 - self.conf['hover_size']) / 2, self.conf['border'])
             cc.scale(self.conf['hover_size'], self.conf['hover_size'])
         if (self.conf['text_position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
             if(self.cover_image.w > self.cover_image.h):
-                print "text"
                 cc.save()
                 cc.translate(0, (self.cover_image.h - self.cover_image.w) / self.cover_image.w)
 
-        print "cover_image"
         self.cover_image.draw(cc, cover_area_size)
         if (self.conf['text_position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
             if(self.cover_image.w > self.cover_image.h):
-                print "restore"
                 cc.restore()
         if self.mouse_over:
-            print "mouseover restore"
             cc.restore()
             
         graphics = cc.pop_group()
@@ -239,10 +244,8 @@ class DesktopControl(Gtk.DrawingArea):
         cc.set_operator(cairo.OPERATOR_OVER)
         cc.paint()
 
-        print "paint"
         # Draw reflections
         if self.conf['draw_reflection']:
-            print "draw_reflection"
             cc.save()
             cc.set_operator(cairo.OPERATOR_ADD)
             cc.translate(0, 2.02)
@@ -250,7 +253,7 @@ class DesktopControl(Gtk.DrawingArea):
                 if(self.cover_image.w > self.cover_image.h):
                     cc.save()
                     cc.translate(0, 2 * (self.cover_image.h - self.cover_image.w) / self.cover_image.w)
-                    print "textposition"
+                    
             cc.scale(1, -1)
             cc.push_group()
             x_scale = cc.get_matrix()[0]
@@ -264,7 +267,7 @@ class DesktopControl(Gtk.DrawingArea):
                     cc.set_source(graphics)
                     cc.paint_with_alpha(1/bn)
                     cc.restore()
-                    print "xrange"
+                    
             graphics = cc.pop_group()
             cc.set_source(graphics)
             shadow_mask = cairo.LinearGradient(0, 1 - self.conf['reflection_height'], 0, 1)
@@ -274,27 +277,27 @@ class DesktopControl(Gtk.DrawingArea):
             if (self.conf['text_position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
                 if(self.cover_image.w > self.cover_image.h):
                     cc.restore()
-                    print "another restore"
+                    
             cc.restore()
 
         # Input mask, only the cover image is clickable
         # Will, (and should) only work if parent is Gtk.Window
-        #print "pixmask"
-        #pixmask = GdkPixmap(None, int(cover_area_size), int(cover_area_size), 1)
-        #ccmask = pixmask.cairo_create()
-        #roundedrec(ccmask, 0, 0, cover_area_size, cover_area_size, self.conf['roundness'])
-        #ccmask.fill()
-        #self.get_parent().input_shape_combine_mask(pixmask, int(x_trans), 0)
-        #suspect this should be Gdk.input_shape_combine_region (pixmask, int(x_trans), 0)
-
-        surface = cairo.ImageSurface(cairo.FORMAT_A1, int(cover_area_size), int(cover_area_size))
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(cover_area_size), int(cover_area_size))
         ccmask = cairo.Context(surface)
         roundedrec(ccmask, 0, 0, cover_area_size, cover_area_size, self.conf['roundness'])
         ccmask.fill()
-#        reg = Gdk.cairo_region_create_from_surface(surface)
-# this throws an error in ubuntu 12.04 - need to test on 12.10 to see if this works
-# i.e. https://bugs.launchpad.net/ubuntu/+source/pygobject/+bug/1028115
-#        self.get_parent().input_shape_combine_region(reg, int(x_trans), 0)
+# bug in python-cairo, upstream is patched, but only for python3-cairo
+# https://bugs.launchpad.net/ubuntu/+source/pygobject/+bug/1028115
+# https://bugzilla.gnome.org/show_bug.cgi?id=667959
+# https://bugs.freedesktop.org/show_bug.cgi?id=44336
+# for the moment wrap this into a try except so that it fails gracefully
+# need to test this on a distro patched and only running python3-cairo
+        try:
+            region = Gdk.cairo_region_create_from_surface(surface)
+            self.get_parent().input_shape_combine_region(region, int(x_trans), 0)
+        except:
+            pass
+            
         # Draw border
         if self.draw_border:
             print "drawborder"
@@ -564,12 +567,7 @@ class CoverImage():
             self.x = (self.dim - self.w) / 2
             self.y = self.dim - self.h
             self.scale = 1 / self.dim
-            print self.scale
-            print self.dim
-            print self.w
-            print self.h
-            print self.x
-            print self.y
+            
         self.current_image = image
 
     def draw_background(self, cc, size = None):
@@ -581,7 +579,6 @@ class CoverImage():
 
     def draw_svg(self, cc, size = None):
         cc.save()
-        print self.scale
         cc.scale(self.scale, self.scale)
         cc.push_group()
         cc.set_operator(cairo.OPERATOR_OVER)
