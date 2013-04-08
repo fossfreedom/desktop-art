@@ -3,6 +3,8 @@ desktop-art
 
 rhythmbox v2.9x plugin to display the coverart and control rhythmbox from your desktop
 
+[![Flattr Button](http://api.flattr.com/button/button-static-50x60.png "Flattr This!")](https://flattr.com/thing/1237263/fossfreedomdesktop-art-on-GitHub "Rhythmbox Desktop Art")
+
 ![Imgur](http://i.imgur.com/Kj1JL.png)
 
 ... and on mouse-over...
