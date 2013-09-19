@@ -33,7 +33,8 @@ import rb
 from gi.repository import Gtk, GObject
 
 from os import path, listdir
-from urllib.request import url2pathname
+#from urllib.request import url2pathname
+from desktop_rb3compat import url2pathname
 
 IMAGE_NAMES = ['cover', 'album', 'albumart', '.folder', 'folder']
 STORAGE_LOC = "~/.gnome2/rhythmbox/covers/"

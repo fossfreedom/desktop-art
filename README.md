@@ -1,7 +1,7 @@
 desktop-art
 ===========
 
-rhythmbox v2.9x plugin to display the coverart and control rhythmbox from your desktop
+rhythmbox v2.96 and later plugin to display the coverart and control rhythmbox from your desktop
 
 ##GTK3 Author
 
@@ -26,11 +26,23 @@ To Install
 
 <pre>
 sudo apt-get install gir1.2-gconf-2.0 gir1.2-rsvg-2.0
-cd ~/.local/share/rhythmbox/plugins
 git clone https://fossfreedom/desktop-art.git
+cd desktop-art
 </pre>
 
-i.e. use the equivalent package names `gir1.2-gconf-2.0 gir1.2-rsvg-2.0` for your distro
+for Rhythmbox 2.96 - 2.99:
+
+<pre>
+./install.sh
+</pre>
+
+for Rhythmbox 3.0 and later:
+
+<pre>
+./install.sh --rb3
+</pre>
+
+N.B. use the equivalent package names `gir1.2-gconf-2.0 gir1.2-rsvg-2.0` for your distro
 
 Enable the plugin in rhythmbox
 
