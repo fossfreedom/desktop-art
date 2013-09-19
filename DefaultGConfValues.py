@@ -44,7 +44,7 @@ def GConf_path(key):
 
 gc = GConf.Client.get_default()
 
-for key, val in defaults.items():
+for key, val in list(defaults.items()):
     path = GConf_path(key)
     if gc.get_without_default(path) == None:
         if isinstance(val, bool):
@@ -56,4 +56,4 @@ for key, val in defaults.items():
         elif isinstance(val, str):
             gc.set_string(path, val)
         else:
-            print 'Datatype %s is not supported' % type(val)
+            print('Datatype %s is not supported' % type(val))

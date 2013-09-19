@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-from __future__ import division
+
 
 #import sys
 from gi.repository import GObject
@@ -40,37 +40,37 @@ POSITION_SE = 'se'
 GConf_plugin_path = '/apps/rhythmbox/plugins/desktop-art'
 
 def get_icon_path(theme, name, size):
-    print "get_icon_path"
+    print("get_icon_path")
     icon = theme.lookup_icon(name, size, Gtk.IconLookupFlags.FORCE_SVG)
     return (icon and icon.get_filename())
 
 def GConf_path(key):
-    print "GConf_path"
+    print("GConf_path")
     return '%s/%s' % (GConf_plugin_path, key)
 
 def read_GConf_values(values, keys):
-    print "read_GConf_values"
+    print("read_GConf_values")
     gc = GConf.Client.get_default()
     for key in keys:
         val = gc.get_without_default(GConf_path(key))
         if val:
-			if val.type == GConf.ValueType.FLOAT:
-				values[key] = val.get_float()
-			elif val.type == GConf.ValueType.INT:
-				values[key] = val.get_int()
-			elif val.type == GConf.ValueType.STRING:
-				values[key] = val.get_string()
-			elif val.type == GConf.ValueType.BOOL:
-				values[key] = val.get_bool()
-			# Parse color strings
-			if 'color' in key:
-				values['%s_r' % key] = int(values[key][ 1: 5], 16) / int('ffff', 16)
-				values['%s_g' % key] = int(values[key][ 5: 9], 16) / int('ffff', 16)
-				values['%s_b' % key] = int(values[key][ 9:13], 16) / int('ffff', 16)
-				values['%s_a' % key] = int(values[key][13:17], 16) / int('ffff', 16)
+            if val.type == GConf.ValueType.FLOAT:
+                values[key] = val.get_float()
+            elif val.type == GConf.ValueType.INT:
+                values[key] = val.get_int()
+            elif val.type == GConf.ValueType.STRING:
+                values[key] = val.get_string()
+            elif val.type == GConf.ValueType.BOOL:
+                values[key] = val.get_bool()
+            # Parse color strings
+            if 'color' in key:
+                values['%s_r' % key] = int(values[key][ 1: 5], 16) / int('ffff', 16)
+                values['%s_g' % key] = int(values[key][ 5: 9], 16) / int('ffff', 16)
+                values['%s_b' % key] = int(values[key][ 9:13], 16) / int('ffff', 16)
+                values['%s_a' % key] = int(values[key][13:17], 16) / int('ffff', 16)
 
 def reread_GConf_value(conf, keys, key):
-    print "reread_GConf_value"
+    print("reread_GConf_value")
     if key in keys:
         read_GConf_values(conf, [key])
 
@@ -128,7 +128,7 @@ class DesktopControl(Gtk.DrawingArea):
         #gc.notify_add('/apps/nautilus/preferences/desktop_font', self.font_changed, [self.song_info])
 
         #gc.add_dir(GConf_plugin_path, GConf.ClientPreloadType.PRELOAD_NONE)
-        
+
         self.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
         self.mouse_over = False
         self.hover_time_out = None
@@ -145,21 +145,21 @@ class DesktopControl(Gtk.DrawingArea):
         gc.notify_add(GConf_plugin_path+'/text_font', self.font_changed, [self.song_info])
 
     def set_GConf_callbacks(self, affected):
-        print "set_GConf_callbacks"
+        print("set_GConf_callbacks")
         gc = GConf.Client.get_default()
         for entry in gc.all_entries(GConf_plugin_path):
-            print entry
+            print(entry)
             path = entry.get_key()
-            print path
+            print(path)
             key = path.split('/')[-1]
-            print key
+            print(key)
             gc.notify_add(path, self.GConf_cb, {'key': key, 'affected': affected})
-            print "end set_GConf_callbacks"
+            print("end set_GConf_callbacks")
 
     def GConf_cb(self, client, cnxn_id, entry, ud):
-        print "GConf_cb"
+        print("GConf_cb")
         for af in ud['affected']:
-            print "affected"
+            print("affected")
             reread_GConf_value(af.conf, af.GConf_keys, ud['key'])
         self.queue_draw()
 
@@ -198,7 +198,7 @@ class DesktopControl(Gtk.DrawingArea):
             self.queue_draw()
 
     def draw_cb(self, widget, cc):
-        print "do_draw_cb"
+        print("do_draw_cb")
         # Clear cairo context
         cc.set_source_rgba(0, 0, 0, 0)
         cc.set_operator(cairo.OPERATOR_SOURCE)
@@ -236,7 +236,7 @@ class DesktopControl(Gtk.DrawingArea):
                 cc.restore()
         if self.mouse_over:
             cc.restore()
-            
+
         graphics = cc.pop_group()
 
         # Draw main graphics
@@ -253,21 +253,21 @@ class DesktopControl(Gtk.DrawingArea):
                 if(self.cover_image.w > self.cover_image.h):
                     cc.save()
                     cc.translate(0, 2 * (self.cover_image.h - self.cover_image.w) / self.cover_image.w)
-                    
+
             cc.scale(1, -1)
             cc.push_group()
             x_scale = cc.get_matrix()[0]
             r1 = int(self.conf['blur'] / 2 + 1.5)
             r0 = r1 - self.conf['blur'] - 1
             bn = (self.conf['blur'] + 1)**2
-            for dx in xrange(r0, r1):
-                for dy in xrange(r0, r1):
+            for dx in range(r0, r1):
+                for dy in range(r0, r1):
                     cc.save()
                     cc.translate(dx/x_scale, dy/x_scale)
                     cc.set_source(graphics)
                     cc.paint_with_alpha(1/bn)
                     cc.restore()
-                    
+
             graphics = cc.pop_group()
             cc.set_source(graphics)
             shadow_mask = cairo.LinearGradient(0, 1 - self.conf['reflection_height'], 0, 1)
@@ -277,7 +277,7 @@ class DesktopControl(Gtk.DrawingArea):
             if (self.conf['text_position'] in [POSITION_NW, POSITION_NE]) and (not self.mouse_over):
                 if(self.cover_image.w > self.cover_image.h):
                     cc.restore()
-                    
+
             cc.restore()
 
         # Input mask, only the cover image is clickable
@@ -297,10 +297,10 @@ class DesktopControl(Gtk.DrawingArea):
             self.get_parent().input_shape_combine_region(region)
         except:
             pass
-            
+
         # Draw border
         if self.draw_border:
-            print "drawborder"
+            print("drawborder")
             cc.identity_matrix()
             cc.rectangle(0, 0, rect.width, rect.height)
             cc.set_line_width(2)
@@ -407,7 +407,7 @@ class DesktopButtons():
                 self.player.do_previous()
             except:
                 pass
-                
+
             return True
         elif self.idata[('play', 'hover')]:
             self.player.playpause(True)
@@ -417,7 +417,7 @@ class DesktopButtons():
                 self.player.do_next()
             except:
                 pass
-                
+
             return True
         return False
 
@@ -434,7 +434,7 @@ class DesktopButtons():
         return redraw
 
     def icon_theme_changed(self, icon_theme):
-        print "icon_theme_changed"
+        print("icon_theme_changed")
         for k in self.icon_keys:
             self.idata[(k, 'icon_path')] = get_icon_path(icon_theme, self.icons[k], self.icons['size'])
             try:
@@ -449,7 +449,7 @@ class DesktopButtons():
                     self.idata[(k, 'h')]     = self.idata[(k, 'image')].get_height()
                     self.idata[(k, 'draw')]  = self.draw_pixbuf_icon
                 except:
-                    print "error no media icons"
+                    print("error no media icons")
                     sys.exit('ERROR: No media icons found.')
             self.idata[(k, 'dim')]   = max(self.idata[(k, 'w')], self.idata[(k, 'h')])
             self.idata[(k, 'scale')] = 1 / self.idata[(k, 'dim')]
@@ -567,7 +567,7 @@ class CoverImage():
             self.x = (self.dim - self.w) / 2
             self.y = self.dim - self.h
             self.scale = 1 / self.dim
-            
+
         self.current_image = image
 
     def draw_background(self, cc, size = None):
@@ -603,7 +603,7 @@ class CoverImage():
         cc.fill_preserve()
         cc.set_operator(cairo.OPERATOR_OVER)
         cc.scale(1/img_scale, 1/img_scale)
-        
+
         #cc.set_source_pixbuf(scaled_image, img_scale * self.x, img_scale * self.y)
         Gdk.cairo_set_source_pixbuf(cc, scaled_image, img_scale * self.x, img_scale * self.y)
         cs = cc.get_source()

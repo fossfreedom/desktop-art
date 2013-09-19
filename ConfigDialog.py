@@ -42,14 +42,14 @@ class ConfigDialog(Gtk.Dialog):
         self.GConf_plugin_path = GConf_plugin_path
         self.desktop_control = desktop_control
         self.plugin = plugin
-        
+
         self.widgets = {}
         self.get_widgets(self.widgets, glade_file)
         self.set_callbacks(self.widgets)
 
         self.vbox.add(self.widgets['main_area'])
         self.widgets['main_area'].set_border_width(6)
-        
+
         self.set_resizable(False)
 
     def get_widgets(self, w, glade_file):
@@ -88,7 +88,7 @@ class ConfigDialog(Gtk.Dialog):
                 rgba = self.gc.get_string(self.GConf_path(name))
                 _, color = Gdk.Color.parse( rgba[:-4] )
                 a = int(rgba[-4:], 16)
-                w[name].set_color(color)  
+                w[name].set_color(color)
                 w[name].set_alpha(a)
             elif isinstance(w[name], Gtk.FontButton):
                 fontname = self.gc.get_string(self.GConf_path(name))

@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 def roundedrec(cc, x, y, w, h, r):
     r = min(1,r)

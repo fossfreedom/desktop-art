@@ -33,7 +33,7 @@ import rb
 from gi.repository import Gtk, GObject
 
 from os import path, listdir
-from urllib import url2pathname
+from urllib.request import url2pathname
 
 IMAGE_NAMES = ['cover', 'album', 'albumart', '.folder', 'folder']
 STORAGE_LOC = "~/.gnome2/rhythmbox/covers/"
@@ -49,17 +49,17 @@ class CoverManager():
     def get_cover(self, db_entry=None):
         # Find cover in music dir
         if db_entry:
-            print "dbentry"
+            print("dbentry")
             cover_dir = path.dirname(url2pathname(db_entry.get_playback_uri()).replace('file://', ''))
             if path.isdir(cover_dir):
-                print cover_dir
+                print(cover_dir)
                 for f in listdir(cover_dir):
                     file_name = path.join(cover_dir, f)
                     mt = mimetypes.guess_type(file_name)[0]
                     if mt and mt.startswith('image/'):
                         if path.splitext(f)[0].lower() in IMAGE_NAMES:
-                            print "spli"
-                            print file_name
+                            print("spli")
+                            print(file_name)
                             return file_name
 
             # Find cover saved by artdisplay plugin
@@ -72,8 +72,8 @@ class CoverManager():
                                             song_info['album'],
                                             file_type))
                     if path.isfile(cover_file):
-                        print "Found image in cache folder"
-                        print cover_file
+                        print("Found image in cache folder")
+                        print(cover_file)
                         return cover_file
 
             key = db_entry.create_ext_db_key(RB.RhythmDBPropType.ALBUM)
@@ -81,7 +81,7 @@ class CoverManager():
             art_location = cover_db.lookup(key)
 
             if art_location and path.exists(art_location):
-                print art_location
+                print(art_location)
                 return art_location
             # Find the image from AlbumArt plugin
             #cover_art = self.db.entry_request_extra_metadata(db_entry, "rb:coverArt")
@@ -90,21 +90,21 @@ class CoverManager():
             #if cover_art==None:
             #    print "Image not found, bloody timeouts"
             #    return DesktopControl.UNKNOWN_COVER
-    
+
                 # Do the dirty work here
                 cover_file = path.expanduser(STORAGE_LOC) + song_info['title'] + "-" + song_info['artist'] + ".jpg"
-                print cover_file
+                print(cover_file)
                 cover_art.save(cover_file, "jpeg", {"quality":"100"})
-                print "Returning cover file"
-                print cover_file
+                print("Returning cover file")
+                print(cover_file)
                 return cover_file
-            
+
 
             # No cover found
-            print "no cover"
+            print("no cover")
             return DesktopControl.UNKNOWN_COVER
         # Not playing
-        print "not playing"
+        print("not playing")
         return None
 
     def get_song_info(self, db_entry=None):
