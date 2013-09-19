@@ -46,7 +46,7 @@ class DesktopArt(GObject.Object, Peas.Activatable):
 
     __gtype_name = 'DesktopArtPlugin'
     object = GObject.property(type=GObject.Object)
-    
+
     def __init__ (self):
         GObject.Object.__init__ (self)
 
@@ -55,10 +55,10 @@ class DesktopArt(GObject.Object, Peas.Activatable):
         ui.add_from_file(rb.find_plugin_file(self,
             'desktop-art.ui'))
         window =  ui.get_object('window')
-        window.set_app_paintable(True)  
+        window.set_app_paintable(True)
         screen = window.get_screen()
         visual = screen.get_rgba_visual()
-            
+
         self.composited = window.is_composited()
         if visual !=None and self.composited:
             window.set_visual(visual)
@@ -67,15 +67,15 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             window.stick()
             window.set_keep_below(True)
 
-            desktop_control = DesktopControl(icons, self.shell, player, 
-				rb.find_plugin_file(self,'configure-art.ui'), self)
+            desktop_control = DesktopControl(icons, self.shell, player,
+                                rb.find_plugin_file(self,'configure-art.ui'), self)
             cover_manager = CoverManager(player.props.db)
             #player.props.db.connect_after("entry-extra-metadata-notify::rb:coverArt-uri", self.notify_metadata)
 
             gc = GConf.Client.get_default()
             gc.add_dir(GConf_plugin_path, GConf.ClientPreloadType.PRELOAD_NONE)
             window_props = self.get_GConf_window_props(gc)
-            
+
             self.gc_notify_ids = [gc.notify_add(self.GConf_path('window_x'), self.GConf_cb, window_props),
                                   gc.notify_add(self.GConf_path('window_y'), self.GConf_cb, window_props),
                                   gc.notify_add(self.GConf_path('window_w'), self.GConf_cb, window_props),
@@ -92,9 +92,9 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             self.desktop_control = desktop_control
             self.cover_manager = cover_manager
 
-            print "Adding timeout"
+            print("Adding timeout")
             ret = GObject.timeout_add(POLL_TIMEOUT, self.poll_for_coverart)
-            print "integer id returned: " + str(ret)
+            print("integer id returned: " + str(ret))
 
             self.position_window(self.window_props)
             self.window.show_all()
@@ -137,12 +137,12 @@ class DesktopArt(GObject.Object, Peas.Activatable):
             return True
         else:
             self.desktop_control.set_song(self.player.get_playing(), c, s)
-            return False          
+            return False
 
     # Subscribe to metadata notification
     # TODO: Not working - notification coming too soon
     def notify_metadata(self, db, entry, field=None,metadata=None):
-        print "Metadata changed changed"
+        print("Metadata changed changed")
         if entry:
             c, s = self.cover_manager.get_cover_and_song_info(entry)
             self.desktop_control.set_song(self.player.get_playing(), c, s)
