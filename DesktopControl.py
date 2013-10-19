@@ -514,7 +514,8 @@ class DesktopButtons():
 
     def draw_pixbuf_icon(self, cc, key):
         cc.scale(self.idata[(key, 'scale')], self.idata[(key, 'scale')])
-        cc.set_source_pixbuf(self.idata[(key, 'image')], 0, 0)
+        #cc.set_source_pixbuf(self.idata[(key, 'image')], 0, 0)
+        Gdk.cairo_set_source_pixbuf(cc, self.idata[(key, 'image')], 0, 0)
         roundedrec(cc, 0, 0, self.idata[(key, 'w')], self.idata[(key, 'h')], self.conf['roundness'])
         cc.fill()
 
