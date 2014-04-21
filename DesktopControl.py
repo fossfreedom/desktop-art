@@ -293,9 +293,14 @@ class DesktopControl(Gtk.DrawingArea):
         # https://bugs.freedesktop.org/show_bug.cgi?id=44336
         # for the moment wrap this into a try except so that it fails gracefully
         # need to test this on a distro patched and only running python3-cairo
+        
+        #21/04/14 - crash observed on 14.04 - currently presume this is a bug so
+        #lets work around this by a test with the pygobject-version 3.12
+        
         try:
-            region = Gdk.cairo_region_create_from_surface(surface)
-            self.get_parent().input_shape_combine_region(region)
+            if pygobject_version() != 3.12:
+                region = Gdk.cairo_region_create_from_surface(surface)
+                self.get_parent().input_shape_combine_region(region)
         except:
             pass
 
