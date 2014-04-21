@@ -298,12 +298,13 @@ class DesktopControl(Gtk.DrawingArea):
         #lets work around this by a test with the pygobject-version 3.12
         
         try:
-            if pygobject_version() != 3.12:
+            print (desktop_rb3compat.pygobject_version())
+            if desktop_rb3compat.pygobject_version() != 3.12:
                 region = Gdk.cairo_region_create_from_surface(surface)
                 self.get_parent().input_shape_combine_region(region)
         except:
             pass
-
+        
         # Draw border
         if self.draw_border:
             print("drawborder")
