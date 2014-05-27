@@ -3,7 +3,7 @@
   <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkWindow" id="window">
     <property name="can_focus">False</property>
-    <property name="type_hint">dock</property>
+    <property name="type_hint">desktop</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>
     <property name="accept_focus">False</property>
