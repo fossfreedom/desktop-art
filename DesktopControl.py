@@ -299,7 +299,7 @@ class DesktopControl(Gtk.DrawingArea):
         
         try:
             print (desktop_rb3compat.pygobject_version())
-            if desktop_rb3compat.pygobject_version() <= 3.12:
+            if desktop_rb3compat.pygobject_version() < 3.12:
                 region = Gdk.cairo_region_create_from_surface(surface)
                 self.get_parent().input_shape_combine_region(region)
         except:
