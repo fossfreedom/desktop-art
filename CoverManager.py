@@ -80,6 +80,11 @@ class CoverManager():
             key = db_entry.create_ext_db_key(RB.RhythmDBPropType.ALBUM)
             cover_db = RB.ExtDB(name='album-art')
             art_location = cover_db.lookup(key)
+            
+            try:
+                art_location = art_location[0] # hack for RB 3.2 api
+            except:
+                pass
 
             if art_location and path.exists(art_location):
                 print(art_location)
