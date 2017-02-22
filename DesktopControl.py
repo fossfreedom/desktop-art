@@ -417,7 +417,7 @@ class DesktopButtons():
 
             return True
         elif self.idata[('play', 'hover')]:
-            self.player.playpause(True)
+            self.player.playpause()
             return True
         elif self.idata[('next', 'hover')]:
             try:
