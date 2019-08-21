@@ -26,7 +26,7 @@ To Install
 
 <pre>
 sudo apt-get install gir1.2-gconf-2.0 gir1.2-rsvg-2.0
-git clone https://fossfreedom/desktop-art.git
+git clone https://github.com/fossfreedom/desktop-art.git
 cd desktop-art
 </pre>
 
